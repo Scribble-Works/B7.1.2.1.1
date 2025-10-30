@@ -1,0 +1,177 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.game-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 550px; /* Slightly wider for better display */
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* --- Score and Question Counter Styles --- */
+
+#score-display {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #00897b; /* Darker Teal */
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 2px solid #b2dfdb;
+    border-radius: 8px;
+    background-color: #e0f2f1; /* Very light teal background */
+}
+
+#question-counter {
+    font-size: 1.1em;
+    color: #00796b; /* Teal */
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding: 5px;
+}
+
+/* --- Problem Area and Input Styles --- */
+
+.problem-area {
+    background-color: #e0f7fa; /* Light blue */
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+#problem-text {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #00796b; /* Teal */
+}
+
+.input-area {
+    margin-bottom: 20px;
+}
+
+#answer-input {
+    padding: 12px;
+    font-size: 1.2em;
+    width: calc(100% - 24px);
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* --- Button Styles (General and Specific) --- */
+
+button {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#check-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+#check-button:hover {
+    background-color: #45a049;
+}
+
+#next-button {
+    background-color: #2196F3; /* Blue */
+    color: white;
+}
+
+#next-button:hover {
+    background-color: #0b7dda;
+}
+
+#hint-button {
+    background-color: #ff9800; /* Orange */
+    color: white;
+    margin-top: 5px;
+}
+
+#hint-button:hover {
+    background-color: #fb8c00;
+}
+
+#play-again-button {
+    background-color: #f44336; /* Red for emphasis */
+    color: white;
+    width: 100%;
+}
+
+#play-again-button:hover {
+    background-color: #d32f2f;
+}
+
+/* --- Feedback and Hint Display Styles --- */
+
+.feedback-message {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 15px;
+    min-height: 30px; 
+    padding: 10px 0;
+}
+
+.correct {
+    color: #4CAF50; /* Green for success */
+}
+
+.incorrect {
+    color: #F44336; /* Red for typical feedback/warning */
+}
+
+/* Specific styling for the End Game Message (using .correct class) */
+#feedback.correct {
+    border: 3px solid #4CAF50;
+    background-color: #e8f5e9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Specific styling for the Hint box */
+#hint-display {
+    text-align: left;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fff3e0; /* Light orange background for hint */
+    border: 1px dashed #ff9800;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/* Override the hint color so it's readable */
+#hint-display.incorrect { 
+    color: #333; 
+}
+
+/* Utility Class */
+.hidden {
+    display: none;
+}
