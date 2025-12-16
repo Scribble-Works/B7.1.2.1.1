@@ -1,267 +1,207 @@
-// --- Game Variables ---
-let currentProblem = {};
-let score = 0;
-let problemCount = 0;
-const MAX_PROBLEMS = 20;
-const POINTS_PER_QUESTION = 5;
-
-// Strategies: 
-// 1. Distributive Property (Breaking up a number: e.g., 8 x 15 = 8 x (10 + 5))
-// 2. Compensation (Rounding and Adjusting: e.g., 9 x 49 = 9 x (50 - 1))
-// 3. Finding compatible numbers (e.g., 4 x 7 x 25 = 4 x 25 x 7)
-const STRATEGIES = [
-    'Distributive Property',
-    'Compensation',
-    'Compatible Numbers'
+// Benchmark fractions as decimals
+const benchmarkFractions = [
+    { label: "½", value: 0.5 },
+    { label: "¼", value: 0.25 },
+    { label: "¾", value: 0.75 },
+    { label: "⅓", value: 1/3 },
+    { label: "⅔", value: 2/3 },
+    { label: "⅕", value: 0.2 }
 ];
 
-// --- DOM Elements (Must be defined first) ---
-const gameContainer = document.querySelector('.game-container');
-const problemText = document.getElementById('problem-text');
-const answerInput = document.getElementById('answer-input');
-const checkButton = document.getElementById('check-button');
-const nextButton = document.getElementById('next-button');
-const feedback = document.getElementById('feedback');
+// Powers of 10 (including decimals)
+const powers = [
+    { display: "10", value: 10, operation: "×" },
+    { display: "100", value: 100, operation: "×" },
+    { display: "1,000", value: 1000, operation: "×" },
+    { display: "0.1", value: 0.1, operation: "×" },
+    { display: "0.01", value: 0.01, operation: "×" },
+    { display: "10", value: 10, operation: "÷" },
+    { display: "100", value: 100, operation: "÷" },
+    { display: "1,000", value: 1000, operation: "÷" },
+    { display: "0.1", value: 0.1, operation: "÷" },
+    { display: "0.01", value: 0.01, operation: "÷" }
+];
 
-// SCORE, COUNTER, HINT ELEMENTS (re-initialize based on previous structure)
-const scoreDisplay = document.createElement('div');
-scoreDisplay.id = 'score-display';
-gameContainer.insertBefore(scoreDisplay, problemText.parentElement);
-
-const questionCounter = document.createElement('p');
-questionCounter.id = 'question-counter';
-gameContainer.insertBefore(questionCounter, scoreDisplay.nextSibling);
-
-const hintButton = document.createElement('button');
-hintButton.id = 'hint-button';
-hintButton.textContent = 'Strategy Hint';
-gameContainer.insertBefore(hintButton, feedback);
-
-const hintDisplay = document.createElement('div');
-hintDisplay.id = 'hint-display';
-hintDisplay.classList.add('feedback-message', 'hidden');
-gameContainer.insertBefore(hintDisplay, feedback);
-
-// --- Problem Generation Functions ---
-
-/**
- * Generates a problem optimized for a specific mental math strategy.
- */
-function generateStrategyProblem() {
-    const strategyIndex = Math.floor(Math.random() * STRATEGIES.length);
-    const strategy = STRATEGIES[strategyIndex];
-    let problemString = '';
-    let answer = 0;
-    let hintText = '';
-
-    if (strategy === 'Distributive Property') {
-        const factor1 = Math.floor(Math.random() * 8) + 3; // 3 to 10
-        const factor2 = Math.floor(Math.random() * 5) * 5 + 11; // e.g., 15, 20, 25, 30...
-        
-        problemString = `${factor1} \u00D7 ${factor2}`; // Use × symbol
-        answer = factor1 * factor2;
-        hintText = `Break the number ${factor2} into **tens and ones** (e.g., $${factor2} = 10 + ${factor2 - 10}$) and multiply both parts by ${factor1}$.`;
-    
-    } else if (strategy === 'Compensation') {
-        const factor = Math.floor(Math.random() * 8) + 2; // 2 to 9
-        const near100 = (Math.random() < 0.5) ? 99 : 49;
-        
-        problemString = `${factor} \u00D7 ${near100}`;
-        answer = factor * near100;
-        hintText = `Round ${near100} to the nearest ${near100 > 50 ? 'hundred' : 'fifty'} (e.g., $${near100 + 1}$) and then subtract the extra amount you added.`;
-
-    } else if (strategy === 'Compatible Numbers') {
-        const compPair = Math.random() < 0.5 ? [4, 25] : [2, 50];
-        const factor = Math.floor(Math.random() * 15) + 5;
-        
-        problemString = `${compPair[0]} \u00D7 ${factor} \u00D7 ${compPair[1]}`;
-        answer = compPair[0] * factor * compPair[1];
-        hintText = `Use the **Commutative Property** to reorder the factors. Multiply the compatible pair ($${compPair[0]} \u00D7 ${compPair[1]} = ${compPair[0] * compPair[1]}$) first!`;
-    }
-
-    currentProblem = {
-        question: problemString,
-        answer: answer,
-        strategy: strategy,
-        hint: hintText
-    };
-}
-
-
-// --- Game Flow Functions (Modified from previous version) ---
-
-/**
- * Generates and displays a new problem, or ends the game.
- */
-function generateProblem() {
-    if (problemCount >= MAX_PROBLEMS) {
-        endGame();
-        return;
-    }
-    
-    // Generate the strategy-based problem
-    generateStrategyProblem();
-    
-    problemCount++;
-
-    // Update the display
-    problemText.textContent = currentProblem.question;
-
-    // Reset UI for new problem
-    answerInput.value = '';
-    feedback.textContent = '';
-    feedback.className = 'feedback-message';
-    checkButton.classList.remove('hidden');
-    nextButton.classList.add('hidden');
-    hintButton.classList.remove('hidden'); 
-    hintDisplay.classList.add('hidden'); 
-    answerInput.disabled = false;
-    answerInput.focus();
-    
-    updateScoreDisplay();
-}
-
-/**
- * Displays the strategy hint for the current problem.
- */
-function giveHint() {
-    hintDisplay.innerHTML = `**Strategy: ${currentProblem.strategy}**<br>${currentProblem.hint}`;
-    hintDisplay.classList.remove('hidden');
-    hintButton.classList.add('hidden');
-    hintDisplay.classList.add('incorrect'); 
-
-    answerInput.focus();
-}
-
-/**
- * Checks the user's input against the correct answer and updates the score.
- */
-function checkAnswer() {
-    const userAnswer = parseInt(answerInput.value.trim());
-
-    if (isNaN(userAnswer)) {
-        feedback.textContent = 'Please enter a valid number!';
-        feedback.className = 'feedback-message incorrect';
-        return;
-    }
-
-    const isCorrect = userAnswer === currentProblem.answer;
-
-    if (isCorrect) {
-        feedback.textContent = `✅ Correct! You used a great strategy to get ${currentProblem.answer}! (+${POINTS_PER_QUESTION} points)`;
-        feedback.className = 'feedback-message correct';
-        score += POINTS_PER_QUESTION; 
+// Number sources: decimals, whole numbers, fractions
+function getRandomNumber() {
+    const choice = Math.random();
+    if (choice < 0.4) {
+        // Decimal
+        return {
+            display: (Math.random() * 200).toFixed(3),
+            value: parseFloat((Math.random() * 200).toFixed(3))
+        };
+    } else if (choice < 0.8) {
+        // Whole number
+        return {
+            display: String(Math.floor(Math.random() * 500) + 1),
+            value: Math.floor(Math.random() * 500) + 1
+        };
     } else {
-        feedback.textContent = `❌ Incorrect. The correct answer is ${currentProblem.answer}. Try using the **${currentProblem.strategy}** strategy next time.`;
-        feedback.className = 'feedback-message incorrect';
+        // Benchmark fraction
+        const frac = benchmarkFractions[Math.floor(Math.random() * benchmarkFractions.length)];
+        return {
+            display: frac.label,
+            value: frac.value
+        };
     }
-    
-    updateScoreDisplay();
-
-    // Update UI
-    checkButton.classList.add('hidden');
-    hintButton.classList.add('hidden');
-    nextButton.classList.remove('hidden');
-    answerInput.disabled = true;
 }
 
-
-/**
- * Updates the score and question counter display.
- */
-function updateScoreDisplay() {
-    scoreDisplay.textContent = `Total Score: ${score} / ${MAX_PROBLEMS * POINTS_PER_QUESTION}`;
-    questionCounter.textContent = `Question ${problemCount} of ${MAX_PROBLEMS}`;
+// Format number for display (avoid long repeating decimals)
+function formatAnswer(num) {
+    if (Math.abs(num) > 1e6 || (Math.abs(num) < 1e-4 && num !== 0)) {
+        return num.toExponential(4);
+    }
+    // Round to max 6 decimal places, remove trailing zeros
+    return parseFloat(num.toFixed(6)).toString();
 }
 
-/**
- * Ends the game, shows final score, and offers to restart.
- */
-function endGame() {
-    // Hide game elements
-    problemText.textContent = '';
-    answerInput.classList.add('hidden');
-    checkButton.classList.add('hidden');
-    nextButton.classList.add('hidden');
-    hintButton.classList.add('hidden');
-    hintDisplay.classList.add('hidden');
-    questionCounter.classList.add('hidden');
+// Generate 10 questions
+const questions = [];
+for (let i = 0; i < 10; i++) {
+    const numberObj = getRandomNumber();
+    const powerObj = powers[Math.floor(Math.random() * powers.length)];
     
-    // Remove old play again button if present
-    const oldPlayAgainButton = document.getElementById('play-again-button');
-    if (oldPlayAgainButton) oldPlayAgainButton.remove();
-
-    // Calculate and display final message
-    const finalScore = score;
-    const maxScore = MAX_PROBLEMS * POINTS_PER_QUESTION;
-    const percentage = (finalScore / maxScore) * 100;
-
-    let celebrationMessage = '';
-    if (percentage === 100) {
-        celebrationMessage = "🎉 PERFECT SCORE! You are a Mental Math Master! 🎉";
-    } else if (percentage >= 80) {
-        celebrationMessage = "🌟 Fantastic effort! Great work applying those strategies! 🌟";
-    } else if (percentage >= 50) {
-        celebrationMessage = "👍 Keep practicing! You've successfully used the properties! 👍";
+    let correct;
+    if (powerObj.operation === "×") {
+        correct = numberObj.value * powerObj.value;
     } else {
-        celebrationMessage = "🧠 Good start! Review how to break numbers apart to make multiplication easier. 🧠";
+        correct = numberObj.value / powerObj.value;
     }
 
-    feedback.innerHTML = `<h2>Game Over!</h2>
-                          <p>${celebrationMessage}</p>
-                          <p>Your Final Score: **${finalScore} out of ${maxScore}**</p>
-                          <p>Percentage: **${percentage.toFixed(0)}%**</p>`;
-    feedback.className = 'feedback-message correct'; 
+    const correctFormatted = formatAnswer(correct);
     
-    // Add Play Again Button
-    const playAgainButton = document.createElement('button');
-    playAgainButton.id = 'play-again-button';
-    playAgainButton.textContent = 'Play Again!';
-    playAgainButton.style.marginTop = '20px';
-    gameContainer.appendChild(playAgainButton);
-    
-    playAgainButton.addEventListener('click', restartGame);
-}
-
-/**
- * Resets variables and starts the game over.
- */
-function restartGame() {
-    score = 0;
-    problemCount = 0;
-    
-    // Remove the Play Again Button
-    const playAgainButton = document.getElementById('play-again-button');
-    if (playAgainButton) {
-        playAgainButton.remove();
-    }
-    
-    // Show hidden elements
-    answerInput.classList.remove('hidden');
-    questionCounter.classList.remove('hidden');
-    
-    // Reset UI and start the first problem
-    feedback.className = 'feedback-message';
-    answerInput.disabled = false;
-    generateProblem();
-}
-
-
-// --- Event Listeners ---
-checkButton.addEventListener('click', checkAnswer);
-nextButton.addEventListener('click', generateProblem);
-hintButton.addEventListener('click', giveHint);
-
-// Allow pressing Enter key to check answer
-answerInput.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        if (!checkButton.classList.contains('hidden')) {
-            checkAnswer();
-        } else if (!nextButton.classList.contains('hidden')) {
-            generateProblem();
+    // Generate distractors: common errors (e.g., shift wrong direction)
+    const distractors = new Set();
+    const attempts = 0;
+    while (distractors.size < 3 && attempts < 20) {
+        // Common mistake: reverse operation
+        let wrong;
+        if (powerObj.operation === "×") {
+            wrong = numberObj.value / powerObj.value; // did ÷ instead
+        } else {
+            wrong = numberObj.value * powerObj.value; // did × instead
+        }
+        distractors.add(formatAnswer(wrong));
+        
+        // Add shifted versions
+        const extraShifts = [10, 100];
+        for (const shift of extraShifts) {
+            if (distractors.size >= 3) break;
+            if (powerObj.operation === "×") {
+                distractors.add(formatAnswer(numberObj.value * (powerObj.value * shift)));
+                distractors.add(formatAnswer(numberObj.value * (powerObj.value / shift)));
+            } else {
+                distractors.add(formatAnswer(numberObj.value / (powerObj.value * shift)));
+                distractors.add(formatAnswer(numberObj.value / (powerObj.value / shift)));
+            }
         }
     }
-});
 
-// --- Start the Game ---
-generateProblem();
+    const options = [correctFormatted, ...Array.from(distractors).slice(0, 3)];
+    // Shuffle
+    for (let j = options.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [options[j], options[k]] = [options[k], options[j]];
+    }
+
+    questions.push({
+        numberDisplay: numberObj.display,
+        numberValue: numberObj.value,
+        operation: powerObj.operation,
+        powerDisplay: powerObj.display,
+        powerValue: powerObj.value,
+        correctAnswer: correctFormatted,
+        options: options
+    });
+}
+
+// Game state
+let currentQuestionIndex = 0;
+let score = 0;
+let correctSound, wrongSound;
+
+// Audio
+function initAudio() {
+    correctSound = new Audio('assets/brass-fanfare-reverberated-146263.mp3');
+    wrongSound = new Audio('assets/cartoon-fail-trumpet-278822.mp3');
+    correctSound.load();
+    wrongSound.load();
+}
+
+function switchScreen(id) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+    currentQuestionIndex = 0;
+    score = 0;
+    switchScreen('quiz-screen');
+    loadQuestion();
+}
+
+function loadQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+        gameOver();
+        return;
+    }
+
+    const q = questions[currentQuestionIndex];
+    document.getElementById('question-number').textContent = `Question ${currentQuestionIndex + 1}/${questions.length}`;
+    
+    // Display: "¼ × 100 = ?" or "45.67 ÷ 10 = ?"
+    document.getElementById('problem-text').textContent = `${q.numberDisplay} ${q.operation} ${q.powerDisplay} = ?`;
+
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach(option => {
+        const button = document.createElement('button');
+        button.classList.add('option-button');
+        button.textContent = option;
+        button.onclick = () => selectOption(button, option, q.correctAnswer);
+        optionsContainer.appendChild(button);
+    });
+}
+
+function selectOption(selectedButton, selectedAnswer, correctAnswer) {
+    document.querySelectorAll('.option-button').forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correctAnswer) {
+            btn.classList.add('correct');
+        } else if (btn === selectedButton) {
+            btn.classList.add('incorrect');
+        }
+    });
+
+    if (selectedAnswer === correctAnswer) {
+        score++;
+        correctSound.currentTime = 0;
+        correctSound.play().catch(e => console.log("Correct sound:", e.message));
+    } else {
+        wrongSound.currentTime = 0;
+        wrongSound.play().catch(e => console.log("Wrong sound:", e.message));
+    }
+
+    setTimeout(() => {
+        currentQuestionIndex++;
+        loadQuestion();
+    }, 1300);
+}
+
+function gameOver() {
+    document.getElementById('final-score').textContent = `You scored ${score} out of ${questions.length}!`;
+    switchScreen('game-over-screen');
+}
+
+function restartGame() {
+    switchScreen('start-screen');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initAudio();
+    switchScreen('start-screen');
+});

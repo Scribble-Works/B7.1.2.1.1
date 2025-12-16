@@ -3,29 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Math Strategy Challenge</title>
+    <title>Multiply & Divide by Powers of 10</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container">
+        <h1>Multiply & Divide by Powers of 10</h1>
 
-    <div class="game-container">
-        <h1>🧠 Mental Math Strategy Challenge</h1>
-        <p>Use number properties and mental strategies to solve these quickly!</p>
-        
-        <div class="problem-area">
-            <span id="problem-text"></span>
+        <div id="start-screen" class="screen active">
+            <h2>B7.1.2.1.1: × and ÷ by Powers of 10</h2>
+            <p>Multiply or divide the given number by the power of 10 shown.</p>
+            <p>Includes decimals and benchmark fractions (½, ¼, etc.).</p>
+            <p>There are 10 questions.</p>
+            <button onclick="startGame()">Start Game</button>
         </div>
 
-        <div class="input-area">
-            <label for="answer-input">Final Answer:</label>
-            <input type="text" id="answer-input" placeholder="Calculate and enter the final result">
+        <div id="quiz-screen" class="screen">
+            <h2 id="question-number">Question 1/10</h2>
+            <p id="problem-text" class="problem-display"></p>
+            <div id="options-container" class="options-grid"></div>
         </div>
 
-        <button id="check-button">Check Answer</button>
-        
-        <div id="feedback" class="feedback-message"></div>
-
-        <button id="next-button" class="hidden">Next Problem</button>
+        <div id="game-over-screen" class="screen">
+            <h2>Game Over! 🥳</h2>
+            <p id="final-score"></p>
+            <button onclick="restartGame()">Play Again</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
